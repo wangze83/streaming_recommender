@@ -1,0 +1,22 @@
+
+# BEGIN
+# 在“BEGIN ”与“END ”之间的指令（行）是
+# 动态生成的，只应被过滤器修改。
+# 任何对标记之间的指令的修改都会被覆盖。
+
+# END
+# BEGIN 
+# The directives (lines) between "BEGIN " and "END " are
+# dynamically generated, and should only be modified via  filters.
+# Any changes to the directives between these markers will be overwritten.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END 

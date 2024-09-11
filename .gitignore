@@ -1,0 +1,40 @@
+*.swp
+.idea
+src/*/tmp
+src/*/run-build
+docker/dev/.env
+
+# Created by .ignore support plugin (hsz.mobi)
+### Go template
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+#ide config files
+*.code-workspace
+*/*/_dev
+*/*/go.sum
+pkg
+_release
+_dev
+.DS_Store
+knowleage-graph/graphservers
+web/examples
+web/igraph
+web/log/*.log
+web/wp-content/cache/dooplay/*.cache
+notebooks/pkl/*.pkl
+notebooks/models/*.h5
+notebooks/datasets/*.csv
+api/*.csv
+mysql_data
+kafka_data
+zookeeper_data

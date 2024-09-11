@@ -1,0 +1,10 @@
+datasets: training.1600000.processed.noemoticon.csv
+
+curl -X POST -H "Content-Type: application/json" -d '{"movie": "Ice Age: Continental Drift"}' http://127.0.0.1:5001/content_based_CF_recommendations
+curl -X POST -H "Content-Type: application/json" -d '{"user": 1}' http://127.0.0.1:5001/tfrs_predict
+curl -X POST -H "Content-Type: application/json" -d '{"text":"this is bad"}' http://localhost:5001/lstm-predict
+curl http://127.0.0.1:5001/kg_recommendations?userid=2&limit=20
+
+# create topic for the first time
+docker exec -it streaming_recommender-wzzzz-kafka-1 /opt/kafka/bin/kafka-topics.sh --create --topic web_rating_data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+

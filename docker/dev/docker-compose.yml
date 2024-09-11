@@ -1,0 +1,116 @@
+version: '3.1'
+
+services:
+
+  streaming_recommender_web:
+    depends_on:
+      - flask-api
+      - mysql
+    image: streaming_recommender_image
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      SR_DB_HOST: mysql
+      SR_DB_USER: root
+      SR_DB_PASSWORD: 123456
+      SR_DB_NAME: streaming_recommender_db
+    volumes:
+      - web:/var/www/html
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: streaming_recommender_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+  flask-api:
+    depends_on:
+      - neo4j
+    image: flask_image
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - api:/app
+      - notebooks/models:/app/models
+      - notebooks/pkl:/app/pkl
+      - notebooks/dataset_out:/app/dataset_out
+    networks:
+      - mynetwork
+
+  neo4j:
+    image: neo4j
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    environment:
+      - NEO4J_AUTH=neo4j/password
+      - NEO4J_dbms_memory_heap_max__size=4G
+    volumes:
+      - neo4j_data/data:/data
+      - neo4j_data/logs:/logs
+      - neo4j_data/import:/var/lib/neo4j/import
+      - neo4j_data/plugins:/plugins
+    networks:
+      - mynetwork
+
+  kafka:
+     image: wurstmeister/kafka:2.12-2.2.1
+     depends_on:
+       - zookeeper
+     ports:
+       - "9092:9092"
+     environment:
+       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+       KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+       KAFKA_LOG_DIRS: /kafka/logs
+       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+     volumes:
+        - kafka_data/logs:/kafka/logs
+     networks:
+        - mynetwork
+
+  zookeeper:
+      image: wurstmeister/zookeeper:3.4.6
+      ports:
+        - "2181:2181"
+      environment:
+        ZOO_MY_ID: 1  # 指定 ZooKeeper 节点的 ID
+      volumes:
+        - zookeeper_data/:/data
+        - zookeeper_data/admin:/admin
+        - zookeeper_data/brokers:/brokers
+        - zookeeper_data/cluster:/cluster
+        - zookeeper_data/config:/config
+      networks:
+        - mynetwork
+
+  golang:
+      depends_on:
+        - kafka
+        - neo4j
+      image: basic_golang_image
+      restart: unless-stopped
+      volumes:
+        - web/log:/app/web_log
+      networks:
+        - mynetwork
+
+networks:
+  mynetwork:

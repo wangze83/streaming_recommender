@@ -1,0 +1,15 @@
+FROM tensorflow/tensorflow
+
+WORKDIR /app
+
+COPY api /app
+
+RUN pip3 install --upgrade pip
+RUN pip3 --no-cache-dir install --default-timeout=1000 -r requirements.txt
+
+
+EXPOSE 5000
+
+ENTRYPOINT ["python3"]
+CMD ["main.py"]
+

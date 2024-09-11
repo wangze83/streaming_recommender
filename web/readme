@@ -1,0 +1,4 @@
+home-top-slide: ORDER BY wp_posts.post_date DESC LIMIT 0, 10;
+detail-page-Similar titles: recommended by the current movie's genres and returned randomly
+detail-page-widget1: random limit 8 by the current movie type(movie or TVShow or episode)
+detail-page-widget2: recommeded by current movie's genre randomly
